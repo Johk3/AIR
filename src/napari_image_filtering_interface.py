@@ -15,7 +15,7 @@ from .napari_image_filters import (
     apply_edge_enhance, apply_edge_detection,
     apply_gaussian_blur, apply_contrast_enhancement,
     apply_texture_analysis, apply_adaptive_threshold,
-    apply_sharpening, apply_ridge_detection
+    apply_sharpening, apply_ridge_detection, apply_cell_segmentation
 )
 
 from .chat_interface import (
@@ -87,7 +87,8 @@ class ImageFilterWidget(QWidget):
             ("Texture Analysis", self._apply_texture_analysis),
             ("Adaptive Threshold", self._apply_adaptive_threshold),
             ("Sharpen", self._apply_sharpening),
-            ("Ridge Detection", self._apply_ridge_detection)
+            ("Ridge Detection", self._apply_ridge_detection),
+            ("Cell Segmentation", self._apply_cell_segmentation)
         ]
 
         for name, method in filter_buttons:
@@ -283,6 +284,21 @@ class ImageFilterWidget(QWidget):
     def _apply_ridge_detection(self):
         """Apply ridge detection to the current image."""
         self._apply_filter(apply_ridge_detection)
+
+    # Define function to call the segmentation
+    def _apply_cell_segmentation(self):
+        """
+        Applies cell segmentation and overlays the detected cells.
+        """
+        try:
+            layer = self._get_current_layer()
+            img = layer.data.copy()
+            mask = apply_cell_segmentation(img)
+            new_layer_name = f"{layer.name} | Segmented Cells"
+            self.viewer.add_labels(mask, name=new_layer_name)
+        except Exception as e:
+            print(f"Error applying cell segmentation: {e}")
+
 
 
 def napari_experimental_provide_dock_widget():
