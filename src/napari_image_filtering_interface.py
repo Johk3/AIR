@@ -300,7 +300,6 @@ class ImageFilterWidget(QWidget):
             print(f"Error applying cell segmentation: {e}")
 
 
-
 def napari_experimental_provide_dock_widget():
     """
     Napari plugin hook to provide the dock widget.

@@ -433,7 +433,10 @@ def sanitize_dimensional_image(pil_img: Image.Image) -> np.ndarray:
 
     return gray_img
 
-def apply_cell_segmentation(img, model_path='./models/tissuenet_model_0019999.pth'):
+
+def apply_cell_segmentation(
+        img,
+        model_path='./models/tissuenet_model_0019999.pth'):
     """
     Applies cell segmentation using CelloType.
 
@@ -449,7 +452,7 @@ def apply_cell_segmentation(img, model_path='./models/tissuenet_model_0019999.pt
         model_path=model_path,
         confidence_thresh=0.3,
         max_det=1000,
-        device='cuda', 
+        device='cuda',
         config_path='./configs/maskdino_R50_bs16_50ep_4s_dowsample1_2048.yaml'
     )
 
