@@ -35,6 +35,7 @@ except OSError:
     STT = None
 from .cellpose_launch import *
 
+
 class ChatWidget(QWidget):
     """
     Multi-modal chat widget supporting text and speech interaction.
@@ -380,11 +381,11 @@ class ChatWidget(QWidget):
             self.cellpose_widget = CellposeNapariWidget(self.viewer)
             # dock it on the right just once
             self.viewer.window.add_dock_widget(self.cellpose_widget,
-                                            name="Cellpose", area="right")
+                                               name="Cellpose", area="right")
         # if user closed the dock, reopen it
         elif self.cellpose_widget not in self.viewer.window._dock_widgets:
             self.viewer.window.add_dock_widget(self.cellpose_widget,
-                                            name="Cellpose", area="right")
+                                               name="Cellpose", area="right")
         return self.cellpose_widget
 
     def execute_command(self, command):
@@ -393,7 +394,7 @@ class ChatWidget(QWidget):
         """
         for act in command:
 
-            # --- Cellpose entry point -----------------------------------------
+            # --- Cellpose entry point ----------------------------------------
             if act.action_name == "cell_segmentation":
                 widget = self._get_cellpose_widget()
 
@@ -405,14 +406,14 @@ class ChatWidget(QWidget):
 
                 widget.run_segmentation()      # defaults already in the GUI
                 widget.apply_to_napari()
-                continue     
+                continue
 
-            # --- everything else (existing filters) ---------------------------
+            # --- everything else (existing filters) --------------------------
             func_name = act.action_name
-            params    = act.action_args
+            params = act.action_args
 
             layer = self.filter_widget._get_current_layer()
-            img   = self.filter_widget.original_data.copy()
+            img = self.filter_widget.original_data.copy()
 
             filtered = (
                 self.available_commands[func_name](img, params[0])
@@ -421,7 +422,3 @@ class ChatWidget(QWidget):
             self.change_layer(layer, filtered, func_name.title())
             if not params:
                 self.filter_widget._push_to_history(layer)
-
-    
-    
-
