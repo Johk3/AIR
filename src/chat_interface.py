@@ -33,7 +33,7 @@ try:
     from .stt import STT
 except OSError:
     STT = None
-
+from .cellpose_launch import *
 
 class ChatWidget(QWidget):
     """
@@ -47,6 +47,7 @@ class ChatWidget(QWidget):
         """
         super().__init__()
         self.viewer = viewer
+        self.cellpose_widget = None
         self.filter_widget = filter_widget  # Reference to an ImageFilterWidget, if needed
         self.setup_ui()
         self.available_commands = {
@@ -301,21 +302,21 @@ class ChatWidget(QWidget):
         """Process a transcript from either recording or streaming"""
         self.chat_history.append(f"[👤] User: <i>{transcript}</i>")
 
-        try:
-            response_text, action = self.Chat.say(transcript)
-            if response_text:
-                self.add_to_chat(f'[🤖] <b>{response_text}</b>')
-                Thread(
-                    target=run_tts_in_thread,
-                    args=(
-                        self.Speak.stream_tts,
-                        response_text),
-                    daemon=True).start()
-            if action:
-                self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
-                self.execute_command(action)
-        except Exception as e:
-            self.add_to_chat("[⚠️] Error: " + str(e))
+        # try:
+        response_text, action = self.Chat.say(transcript)
+        if response_text:
+            self.add_to_chat(f'[🤖] <b>{response_text}</b>')
+            Thread(
+                target=run_tts_in_thread,
+                args=(
+                    self.Speak.stream_tts,
+                    response_text),
+                daemon=True).start()
+        if action:
+            self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
+            self.execute_command(action)
+        # except Exception as e:
+        #     self.add_to_chat("[⚠️] Error: " + str(e))
 
     def process_input(self):
         """
@@ -373,26 +374,54 @@ class ChatWidget(QWidget):
         new_layer_name = f"{curr_layer.name} | {filter_name}"
         self.viewer.add_image(filtered_array, name=new_layer_name)
 
+    def _get_cellpose_widget(self):
+        """Create (or return) the docked Cellpose widget and make sure it is visible."""
+        if self.cellpose_widget is None:
+            self.cellpose_widget = CellposeNapariWidget(self.viewer)
+            # dock it on the right just once
+            self.viewer.window.add_dock_widget(self.cellpose_widget,
+                                            name="Cellpose", area="right")
+        # if user closed the dock, reopen it
+        elif self.cellpose_widget not in self.viewer.window._dock_widgets:
+            self.viewer.window.add_dock_widget(self.cellpose_widget,
+                                            name="Cellpose", area="right")
+        return self.cellpose_widget
+
     def execute_command(self, command):
         """
-        Executes a command from the LLM
+        Executes a command sent by the LLM.
         """
-        # print(command)
+        for act in command:
 
-        for action in command:
+            # --- Cellpose entry point -----------------------------------------
+            if act.action_name == "cell_segmentation":
+                widget = self._get_cellpose_widget()
 
-            funct = action.action_name
-            param = action.action_args
+                model, chan1, diameter, flow_thr = list(act.action_args or [])
+                widget.model_selector.setCurrentText(str(model))
+                widget.chan1_selection.setCurrentIndex(chan1)
+                widget.diameter_spin.setValue(diameter)
+                widget.flow_spin.setValue(flow_thr)
+
+                widget.run_segmentation()      # defaults already in the GUI
+                widget.apply_to_napari()
+                continue     
+
+            # --- everything else (existing filters) ---------------------------
+            func_name = act.action_name
+            params    = act.action_args
 
             layer = self.filter_widget._get_current_layer()
-            img = self.filter_widget.original_data.copy()
+            img   = self.filter_widget.original_data.copy()
 
-            if param != []:
-                filtered_array = self.available_commands[funct](
-                    img, param[0])
-            else:
-                filtered_array = self.available_commands[funct](img)
-            self.change_layer(layer, filtered_array, funct.title())
-            if param == []:
+            filtered = (
+                self.available_commands[func_name](img, params[0])
+                if params else self.available_commands[func_name](img)
+            )
+            self.change_layer(layer, filtered, func_name.title())
+            if not params:
                 self.filter_widget._push_to_history(layer)
-        return
+
+    
+    
+
