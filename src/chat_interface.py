@@ -34,11 +34,6 @@ try:
 except OSError:
     STT = None
 from .cellpose_launch import *
-<< << << < HEAD
-
-== == == =
->>>>>> > 0fc7298(llm can use cell_seg)
-
 
 class ChatWidget(QWidget):
     """
@@ -307,21 +302,21 @@ class ChatWidget(QWidget):
         """Process a transcript from either recording or streaming"""
         self.chat_history.append(f"[👤] User: <i>{transcript}</i>")
 
-        # try:
-        response_text, action = self.Chat.say(transcript)
-        if response_text:
-            self.add_to_chat(f'[🤖] <b>{response_text}</b>')
-            Thread(
-                target=run_tts_in_thread,
-                args=(
-                    self.Speak.stream_tts,
-                    response_text),
-                daemon=True).start()
-        if action:
-            self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
-            self.execute_command(action)
-        # except Exception as e:
-        #     self.add_to_chat("[⚠️] Error: " + str(e))
+        try:
+            response_text, action = self.Chat.say(transcript)
+            if response_text:
+                self.add_to_chat(f'[🤖] <b>{response_text}</b>')
+                Thread(
+                    target=run_tts_in_thread,
+                    args=(
+                        self.Speak.stream_tts,
+                        response_text),
+                    daemon=True).start()
+            if action:
+                self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
+                self.execute_command(action)
+        except Exception as e:
+            self.add_to_chat("[⚠️] Error: " + str(e))
 
     def process_input(self):
         """
@@ -385,21 +380,11 @@ class ChatWidget(QWidget):
             self.cellpose_widget = CellposeNapariWidget(self.viewer)
             # dock it on the right just once
             self.viewer.window.add_dock_widget(self.cellpose_widget,
-<< << << < HEAD
-                                               name="Cellpose", area="right")
-        # if user closed the dock, reopen it
-        elif self.cellpose_widget not in self.viewer.window._dock_widgets:
-            self.viewer.window.add_dock_widget(self.cellpose_widget,
-                                               name="Cellpose", area="right")
-
-
-== == == =
-                                            name = "Cellpose", area = "right")
+                                            name="Cellpose", area="right")
         # if user closed the dock, reopen it
         elif self.cellpose_widget not in self.viewer.window._dock_widgets:
             self.viewer.window.add_dock_widget(self.cellpose_widget,
                                             name="Cellpose", area="right")
->>>>>>> 0fc7298 (llm can use cell_seg)
         return self.cellpose_widget
 
     def execute_command(self, command):
@@ -408,11 +393,7 @@ class ChatWidget(QWidget):
         """
         for act in command:
 
-<<<<<<< HEAD
-            # --- Cellpose entry point ----------------------------------------
-=======
             # --- Cellpose entry point -----------------------------------------
->>>>>>> 0fc7298 (llm can use cell_seg)
             if act.action_name == "cell_segmentation":
                 widget = self._get_cellpose_widget()
 
@@ -424,19 +405,11 @@ class ChatWidget(QWidget):
 
                 widget.run_segmentation()      # defaults already in the GUI
                 widget.apply_to_napari()
-<<<<<<< HEAD
-                continue
-
-            # --- everything else (existing filters) --------------------------
-            func_name = act.action_name
-            params = act.action_args
-=======
                 continue     
 
             # --- everything else (existing filters) ---------------------------
             func_name = act.action_name
             params    = act.action_args
->>>>>>> 0fc7298 (llm can use cell_seg)
 
             layer = self.filter_widget._get_current_layer()
             img   = self.filter_widget.original_data.copy()
@@ -448,10 +421,7 @@ class ChatWidget(QWidget):
             self.change_layer(layer, filtered, func_name.title())
             if not params:
                 self.filter_widget._push_to_history(layer)
-<<<<<<< HEAD
-=======
 
     
     
 
->>>>>>> 0fc7298 (llm can use cell_seg)
