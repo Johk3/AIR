@@ -34,10 +34,11 @@ try:
 except OSError:
     STT = None
 from .cellpose_launch import *
-<<<<<<< HEAD
+<< << << < HEAD
 
-=======
->>>>>>> 0fc7298 (llm can use cell_seg)
+== == == =
+>>>>>> > 0fc7298(llm can use cell_seg)
+
 
 class ChatWidget(QWidget):
     """
@@ -384,14 +385,16 @@ class ChatWidget(QWidget):
             self.cellpose_widget = CellposeNapariWidget(self.viewer)
             # dock it on the right just once
             self.viewer.window.add_dock_widget(self.cellpose_widget,
-<<<<<<< HEAD
+<< << << < HEAD
                                                name="Cellpose", area="right")
         # if user closed the dock, reopen it
         elif self.cellpose_widget not in self.viewer.window._dock_widgets:
             self.viewer.window.add_dock_widget(self.cellpose_widget,
                                                name="Cellpose", area="right")
-=======
-                                            name="Cellpose", area="right")
+
+
+== == == =
+                                            name = "Cellpose", area = "right")
         # if user closed the dock, reopen it
         elif self.cellpose_widget not in self.viewer.window._dock_widgets:
             self.viewer.window.add_dock_widget(self.cellpose_widget,
