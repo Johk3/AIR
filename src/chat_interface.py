@@ -62,6 +62,7 @@ class ChatWidget(QWidget):
             "threshold": apply_adaptive_threshold,
             "sharpen": apply_sharpening,
             "ridge_detection": apply_ridge_detection,
+            "ask_clarification" : "part of temporary solution may 14 2025",
         }
 
         voice_settings = {
@@ -315,7 +316,7 @@ class ChatWidget(QWidget):
                     daemon=True).start()
             if action:
                 self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
-                self.execute_command(action)
+                self.execute_command(action, response_text)
         except Exception as e:
             self.add_to_chat("[⚠️] Error: " + str(e))
 
@@ -343,7 +344,7 @@ class ChatWidget(QWidget):
                     daemon=True).start()
             if action:
                 self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
-                self.execute_command(action)
+                self.execute_command(action, response_text)
         except Exception as e:
             self.add_to_chat("[⚠️] Error: " + str(e))
 
@@ -373,6 +374,7 @@ class ChatWidget(QWidget):
 
         # Create new layer with descriptive name and add to napari viewer
         new_layer_name = f"{curr_layer.name} | {filter_name}"
+
         self.viewer.add_image(filtered_array, name=new_layer_name)
 
     def _get_cellpose_widget(self):
@@ -388,7 +390,7 @@ class ChatWidget(QWidget):
                                                name="Cellpose", area="right")
         return self.cellpose_widget
 
-    def execute_command(self, command):
+    def execute_command(self, command, response_text):
         """
         Executes a command sent by the LLM.
         """
@@ -414,6 +416,49 @@ class ChatWidget(QWidget):
 
             layer = self.filter_widget._get_current_layer()
             img = self.filter_widget.original_data.copy()
+
+            # import matplotlib
+            # import matplotlib.pyplot as plt
+            # matplotlib.use("module://matplotlib-backend-kitty")
+            # plt.imshow(img)
+            # plt.show()
+
+            # i am so sorry for this code, this is only meant to be a temporary fix right before the demo
+            # I promise ill fix it someday
+
+            if func_name == "grayscale":
+                self.filter_widget._apply_grayscale() 
+                return
+            if func_name == "saturation":
+                self.filter_widget._apply_saturation()
+                return
+            if func_name == "edge_enhance":
+                self.filter_widget._apply_edge_enhance()
+                return
+            if func_name == "edge_detection":
+                self.filter_widget._apply_edge_detection()
+                return
+            if func_name == "blur":
+                self.filter_widget._apply_gaussian_blur()
+                return
+            if func_name == "contrast":
+                self.filter_widget._apply_contrast_enhancement()
+                return
+            if func_name == "texture":
+                self.filter_widget._apply_texture_analysis()
+                return
+            if func_name == "threshold":
+                self.filter_widget._apply_otsu_thresholding()
+                return
+            if func_name == "sharpen":
+                self.filter_widget._apply_sharpening()
+                return
+            if func_name == "ridge_detection":
+                self.filter_widget._apply_ridge_detection()
+                return
+            if func_name == "ask_clarification":
+                print("response text", response_text)
+                self.filter_widget._apply_clarification(response_text)
 
             filtered = (
                 self.available_commands[func_name](img, params[0])
