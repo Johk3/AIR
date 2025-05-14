@@ -62,7 +62,7 @@ class ChatWidget(QWidget):
             "threshold": apply_adaptive_threshold,
             "sharpen": apply_sharpening,
             "ridge_detection": apply_ridge_detection,
-            "ask_clarification" : "part of temporary solution may 14 2025",
+            "ask_clarification": "part of temporary solution may 14 2025",
         }
 
         voice_settings = {
@@ -427,7 +427,7 @@ class ChatWidget(QWidget):
             # I promise ill fix it someday
 
             if func_name == "grayscale":
-                self.filter_widget._apply_grayscale() 
+                self.filter_widget._apply_grayscale()
                 return
             if func_name == "saturation":
                 self.filter_widget._apply_saturation()

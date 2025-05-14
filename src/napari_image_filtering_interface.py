@@ -341,9 +341,8 @@ class ImageFilterWidget(QWidget):
     def _split_channels(self):
         self._apply_filter(split_channels)
 
-    def _apply_clarification(self, msg : str):
+    def _apply_clarification(self, msg: str):
         self.add_to_chat(msg)
-
 
 
 def napari_experimental_provide_dock_widget():
