@@ -62,7 +62,6 @@ class ChatWidget(QWidget):
             "threshold": apply_adaptive_threshold,
             "sharpen": apply_sharpening,
             "ridge_detection": apply_ridge_detection,
-            "ask_clarification": "part of temporary solution may 14 2025",
         }
 
         voice_settings = {
@@ -456,9 +455,6 @@ class ChatWidget(QWidget):
             if func_name == "ridge_detection":
                 self.filter_widget._apply_ridge_detection()
                 return
-            if func_name == "ask_clarification":
-                print("response text", response_text)
-                self.filter_widget._apply_clarification(response_text)
 
             filtered = (
                 self.available_commands[func_name](img, params[0])
