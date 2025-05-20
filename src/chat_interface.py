@@ -305,6 +305,7 @@ class ChatWidget(QWidget):
 
         try:
             response_text, action = self.Chat.say(transcript)
+                
             if response_text:
                 self.add_to_chat(f'[🤖] <b>{response_text}</b>')
                 Thread(
@@ -314,10 +315,12 @@ class ChatWidget(QWidget):
                         response_text),
                     daemon=True).start()
             if action:
+                print("ACTION IS", action)
                 self.add_to_chat(f'[⚙️] <b>{self.format_action(action)}</b>')
                 self.execute_command(action, response_text)
         except Exception as e:
-            self.add_to_chat("[⚠️] Error: " + str(e))
+            # self.add_to_chat("[⚠️] Error: " + str(e))
+            pass
 
     def process_input(self):
         """
@@ -416,14 +419,12 @@ class ChatWidget(QWidget):
             layer = self.filter_widget._get_current_layer()
             img = self.filter_widget.original_data.copy()
 
-            # import matplotlib
-            # import matplotlib.pyplot as plt
-            # matplotlib.use("module://matplotlib-backend-kitty")
-            # plt.imshow(img)
-            # plt.show()
-
-            # i am so sorry for this code, this is only meant to be a temporary fix right before the demo
-            # I promise ill fix it someday
+            # if func_name is not in the available_commands, we need to grep action_args to see if it was there instead
+            if func_name not in self.available_commands:
+                for arg in params:
+                    if arg in self.available_commands:
+                        func_name = arg
+                        break
 
             if func_name == "grayscale":
                 self.filter_widget._apply_grayscale()
@@ -455,11 +456,15 @@ class ChatWidget(QWidget):
             if func_name == "ridge_detection":
                 self.filter_widget._apply_ridge_detection()
                 return
+            if func_name == "otsu_threshold":
+                self.filter_widget._apply_otsu_thresholding()
+            else:
+                return
 
-            filtered = (
-                self.available_commands[func_name](img, params[0])
-                if params else self.available_commands[func_name](img)
-            )
-            self.change_layer(layer, filtered, func_name.title())
-            if not params:
-                self.filter_widget._push_to_history(layer)
+            # filtered = (
+            #     self.available_commands[func_name](img, params[0])
+            #     if params else self.available_commands[func_name](img)
+            # )
+            # self.change_layer(layer, filtered, func_name.title())
+            # if not params:
+            #     self.filter_widget._push_to_history(layer)
