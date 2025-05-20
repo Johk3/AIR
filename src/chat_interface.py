@@ -305,7 +305,7 @@ class ChatWidget(QWidget):
 
         try:
             response_text, action = self.Chat.say(transcript)
-                
+
             if response_text:
                 self.add_to_chat(f'[🤖] <b>{response_text}</b>')
                 Thread(
@@ -419,7 +419,8 @@ class ChatWidget(QWidget):
             layer = self.filter_widget._get_current_layer()
             img = self.filter_widget.original_data.copy()
 
-            # if func_name is not in the available_commands, we need to grep action_args to see if it was there instead
+            # if func_name is not in the available_commands, we need to grep
+            # action_args to see if it was there instead
             if func_name not in self.available_commands:
                 for arg in params:
                     if arg in self.available_commands:

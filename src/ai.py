@@ -1,3 +1,4 @@
+from collections import deque
 from os import remove
 from pydantic import BaseModel
 from typing import List, Union
@@ -7,15 +8,15 @@ from json import dumps, loads
 from base64 import b64decode
 import websockets
 
+
 class ActionModel(BaseModel):
     action_name: str
     action_args: List[Union[str, int, bool]]
 
+
 class ActionChainModel(BaseModel):
     response_text: str  # Note: Fixed typo "reponse_text" -> "response_text"
     action: List[ActionModel]
-
-from collections import deque
 
 
 class GPT:
@@ -33,31 +34,31 @@ INSTRUCTIONS:
 
 AVAILABLE COMMANDS:
 
-- grayscale  
-- saturation <value> (0–200)  
-- edge_enhance  
-- edge_detection  
-- blur <radius> (0.1–10.0)  
-- contrast <factor> (0.1–3.0)  
-- texture  
-- threshold  
-- sharpen  
-- ridge_detection  
+- grayscale
+- saturation <value> (0–200)
+- edge_enhance
+- edge_detection
+- blur <radius> (0.1–10.0)
+- contrast <factor> (0.1–3.0)
+- texture
+- threshold
+- sharpen
+- ridge_detection
 - otsu_threshold
-- None  
-- cell_segmentation <model> <chan1> <diameter> <flow_thr>  
-  • model: cyto | nuclei | tissuenet  
-  • chan1: 0=gray,1=red,2=green,3=blue  
-  • diameter: integer (default 35)  
+- None
+- cell_segmentation <model> <chan1> <diameter> <flow_thr>
+  • model: cyto | nuclei | tissuenet
+  • chan1: 0=gray,1=red,2=green,3=blue
+  • diameter: integer (default 35)
   • flow_thr: float (default 0.0)
 
-User: hello  
-Assistant:  
+User: hello
+Assistant:
 Hello, how may I help you with your image today?
-None  
+None
 
 User: What are the available image filters?
-Assistant:  
+Assistant:
 The available image filters are:
 - grayscale
 - saturation
@@ -65,58 +66,58 @@ The available image filters are:
 - edge_detection
 - blur
 - model-based cell segmentation
-None  
+None
 
 User: I would like to segment the cells, but since I am a beginner I am not sure what cell segmentation even does.
-Assistant:  
+Assistant:
 Cell segmentation separates cells in images for detailed analysis. Do you want a more detailed explanation? Alternatively I can also apply the cell segmentation to the image for you.
-None  
+None
 
 User: The image is a bit blurry, lets make it sharper
-Assistant:  
+Assistant:
 Improved image sharpness for clearer details. Are there any other changes you'd like to make?
-sharpen  
+sharpen
 
-User: please apply grayscale  
-Assistant:  
+User: please apply grayscale
+Assistant:
 Converted image to grayscale for color removal. Are there any other changes you'd like to make?
-grayscale  
+grayscale
 
-User: can you sharpen the image?  
-Assistant:  
+User: can you sharpen the image?
+Assistant:
 Improved image sharpness for clearer details. Are there any other changes you'd like to make?
-sharpen  
+sharpen
 
-User: what is cell segmentation?  
-Assistant:  
+User: what is cell segmentation?
+Assistant:
 Cell segmentation separates cells in images for detailed analysis. Do you want a more detailed explanation?
-None  
+None
 
 User: Sure, can you explain it in more detail?
 
-Assistant:  
+Assistant:
 Cell segmentation is the computational process of delineating individual cells within microscopy images, enabling quantitative analysis of cellular morphology and spatial organization. It is fundamental for downstream tasks such as cell counting, tracking, and phenotypic classification in biological and medical research. Accurate segmentation often leverages advanced models that account for overlapping cells and heterogeneous imaging conditions.
-None  
+None
 
 User: Do you have any suggestions for how we can segment the cells?
-Assistant:  
+Assistant:
 I recommend using the nuclei model with default parameters. This generally works well for most images. Alternatively, you can try the cyto model for better detection of cell boundaries.
-None  
+None
 
 User: I'd like to try the cyto model.
-Assistant:  
+Assistant:
 Segmented cells using cyto model with default parameters. Are there any other changes you'd like to make?
-cell_segmentation cyto 0 35 0.0  
+cell_segmentation cyto 0 35 0.0
 
 User: Lets apply texture analysis to the image.
-Assistant:  
+Assistant:
 Applied texture analysis to the image. Are there any other changes you'd like to make?
-texture  
+texture
 
 User: apply the watershed filter
-Assistant:  
+Assistant:
 Unfortunatly the watershed filter is not available. Are there any other changes you'd like to make?
-None  
+None
 
 ---------- NEW CONVERSATION ----------
 
@@ -124,7 +125,7 @@ None
         }
 
     def say(self, message: str):
-        #append to start of messages
+        # append to start of messages
         self.messages.append({"role": "user", "content": message})
         # use a lower temperature for the response
         # edit the system prompt to be more specific about the response format
